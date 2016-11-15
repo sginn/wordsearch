@@ -1,13 +1,12 @@
 def write_wordsearch(f, wordsearch, wordlist):
 
-    '''prints 2d wordsearch to screen
+    '''Writes wordsearch and wordlist to given output stream
 
-        [['a','b','c'], ['d', 'e', 'f'], ['g','h','i']]
-
-        a b c
-        d e f
-        g h i
+    f: output stream, typically a file handle
+    wordsearch: the grid
+    wordlist: the words to find
     '''
+
     for row in wordsearch:
         f.write(" ".join(row))
         f.write("\n")
@@ -18,11 +17,23 @@ def write_wordsearch(f, wordsearch, wordlist):
 
 
 def load_wordlist(f):
+    ''' Retrieves valid words (and errors) from the given line-delimited input source
+
+    returns a wordlist and list of errors found
+    '''
     wordlist = f.readlines()
     return sanitize_wordlist(wordlist)
 
 
 def sanitize_wordlist(wordlist):
+    ''' Ensures the wordlist is 'safe'
+
+    Will remove whitespace, make uppercase and ensures
+    there aren't any duplicates or substrings and
+    words are at least 3 characters
+
+    returns two lists: valid wordlist and any found errors
+    '''
     wordlist = map(str.strip, wordlist)
     wordlist = map(str.upper, wordlist)
 
