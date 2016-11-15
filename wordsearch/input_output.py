@@ -6,14 +6,15 @@ def write_wordsearch(f, wordsearch, wordlist):
     wordsearch: the grid
     wordlist: the words to find
     '''
+    wordlist.sort()
+    for word in wordlist:
+        f.write("{word}\n".format(word=word))
+
+    f.write("\n\n")
 
     for row in wordsearch:
         f.write(" ".join(row))
         f.write("\n")
-
-    wordlist.sort()
-    for word in wordlist:
-        f.write("{word}\n".format(word=word))
 
 
 def load_wordlist(f):
