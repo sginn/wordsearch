@@ -12,6 +12,7 @@ def write_wordsearch(f, wordsearch, wordlist):
         f.write(" ".join(row))
         f.write("\n")
 
+    wordlist.sort()
     for word in wordlist:
         f.write("{word}\n".format(word=word))
 
