@@ -133,7 +133,6 @@ def place_words(grid, words_left):
         return True
 
     word_to_place = words_left[0]
-    print "Placing {word}".format(word=word_to_place)
 
     tested_positions = set()
     # randomize directions to try
@@ -168,8 +167,4 @@ def place_words(grid, words_left):
                     transfer_cells(grid, backtrack_grid)
 
     # we exhausted all positions and directions for this word, backtrack...
-    print "**** Couldn't find a solution, have to backtrack ****"
-    for row in grid:
-        print " ".join(row)
-    print "***********"
     return False
