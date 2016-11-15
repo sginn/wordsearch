@@ -26,9 +26,16 @@ def sanitize_wordlist(wordlist):
     wordlist = map(str.upper, wordlist)
 
     words = " ".join(wordlist)
+    errors = []
+
     for word in wordlist:
-        if words.count(word) > 1:
-            print "DISCARDING ", word
+        if len(word) < 3:
+            errors.append(word)
             wordlist.remove(word)
 
-    return wordlist
+        # if word appears more than once or is a substring, reject it
+        if words.count(word) > 1:
+            errors.append(word)
+            wordlist.remove(word)
+
+    return wordlist, errors

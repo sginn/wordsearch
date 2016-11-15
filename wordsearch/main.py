@@ -19,7 +19,10 @@ def main():
 
     print "== Loading wordlist"
     with open(args.wordlist, "r") as wordlist_file:
-        wordlist = load_wordlist(wordlist_file)
+        wordlist, errors = load_wordlist(wordlist_file)
+
+    if errors:
+        print "    NOTE: Rejected words", errors
 
     print "== Generating wordsearch"
     wordsearch, answer_key = generate_wordsearch(wordlist, difficulty=args.grid_size)
