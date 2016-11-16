@@ -1,6 +1,6 @@
 import string
 
-from constants import DIRECTIONS, EMPTY_SPACE
+import constants
 from grid_helpers import find_protected_cells, is_palindrome, see_if_word_found
 from random import choice, randrange, sample, shuffle
 from validate import validate
@@ -63,7 +63,7 @@ def fill_in(grid, wordlist, sample_size=8):
                                                                min(sample_size, 26))
     for x in range(0, len(grid)):
         for y in range(0, len(grid)):
-            if grid[x][y] == EMPTY_SPACE:
+            if grid[x][y] == constants.EMPTY_SPACE:
                 grid[x][y] = choice(preference_letters)
 
 
@@ -81,7 +81,7 @@ def scramble_found_words(grid, wordlist, protected_cells=set()):
         for x in range(len(grid)):
             for y in range(len(grid)):
                 if grid[x][y] == word[0]:
-                    for direction in DIRECTIONS:
+                    for direction in constants.DIRECTIONS:
                         found, possible_coordinates = see_if_word_found(grid, word, x, y, direction)
                         if found:
                             coordinates_of_words.union(possible_coordinates)
@@ -108,8 +108,9 @@ def place_words(grid, words_left):
 
     tested_positions = set()
     # randomize directions to try
-    directions = sample(DIRECTIONS, len(DIRECTIONS))
+    directions = sample(constants.DIRECTIONS, len(constants.DIRECTIONS))
     num_cells_in_grid = len(grid)*len(grid)
+    backtrack_count = 0
 
     while len(tested_positions) < num_cells_in_grid:
 
@@ -119,7 +120,7 @@ def place_words(grid, words_left):
         tested_positions.add((xpos, ypos))
 
         # if this is not a possible starting spot, continue
-        if grid[xpos][ypos] != EMPTY_SPACE and grid[xpos][ypos] != word_to_place[0]:
+        if grid[xpos][ypos] != constants.EMPTY_SPACE and grid[xpos][ypos] != word_to_place[0]:
             continue
 
         # try to place the word
@@ -144,7 +145,7 @@ def place_words(grid, words_left):
 
 def _init_grid(size):
     ''' create a square grid '''
-    return [[EMPTY_SPACE for x in range(size)] for y in range(size)]
+    return [[constants.EMPTY_SPACE for x in range(size)] for y in range(size)]
 
 
 def _word_can_fit(grid, word, x, y, direction):
@@ -169,7 +170,7 @@ def _word_can_fit(grid, word, x, y, direction):
 
     # check placement of letters, if we hit a populated cell with a mismatched letter, fail
     for letter in word:
-        if grid[x][y] == letter or grid[x][y] == EMPTY_SPACE:
+        if grid[x][y] == letter or grid[x][y] == constants.EMPTY_SPACE:
             x += direction[0]
             y += direction[1]
         else:
