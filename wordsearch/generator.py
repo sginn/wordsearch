@@ -1,11 +1,12 @@
 import string
 
 from constants import DIRECTIONS, EMPTY_SPACE
+from grid_helpers import find_protected_cells, is_palindrome, see_if_word_found
 from random import choice, randrange, sample, shuffle
 from validate import validate
 
 
-def generate_wordsearch(wordlist, difficulty=1):
+def generate_wordsearch(wordlist, min_grid_size=1):
     ''' Creates a wordsearch and returns the generated grid and an answer key
 
     wordlist: The words to populate the grid with
@@ -15,28 +16,40 @@ def generate_wordsearch(wordlist, difficulty=1):
     shuffle(wordlist)
 
     # Start the grid with size equal to longest word in list
-    grid = _init_grid(difficulty * max(map(len, wordlist)))
+    word_lengths = map(len, wordlist)
+    total_chars = len("".join(wordlist))
+    initial_grid_size = max(word_lengths + [min_grid_size])
+    while initial_grid_size * initial_grid_size <= 1.4 * total_chars:
+        initial_grid_size += 1
 
-    while not place_words(grid, words_left=wordlist):
+    answer_key = _init_grid(initial_grid_size)
+
+    while not place_words(answer_key, words_left=wordlist) or not validate(answer_key, wordlist):
         # we couldn't find a solution, so make the grid bigger and try again
-        print "Couldn't find a solution with size", len(grid), "Going bigger and trying again"
-        grid = _init_grid(len(grid)+1)
+        print "Couldn't place words on grid size of ", len(answer_key), "trying bigger"
+        answer_key = _init_grid(len(answer_key)+1)
 
-    answer_key = _copy_grid(grid)
+    '''
+        Create a random grid
+        merge answer_key over
+        if a word found too many times, swap a letter
+    '''
 
-    fill_in(grid, wordlist)
+    protected_cells = find_protected_cells(answer_key)
+    random_grid = _copy_grid(answer_key)
+    fill_in(random_grid, wordlist)
 
     failure_count = 0
-    print "Validating grid"
-    while not validate(grid, wordlist) and failure_count < 5:
+    while not validate(random_grid, wordlist):
         failure_count += 1
-        wordsearch = _copy_grid(answer_key)
-        fill_in(wordsearch, wordlist, failure_count)
+        scramble_found_words(random_grid, wordlist, protected_cells)
+        # if after 5 tries we still haven't made it work, let's abandon and start over
+        # TODO: it's pretty bad to recurse here.
+        # Really should try placing words again with a larger grid
+        if failure_count > 5:
+            return generate_wordsearch(wordlist, min_grid_size)
 
-    if failure_count == 5:
-        return generate_wordsearch(wordlist, difficulty)
-
-    return grid, answer_key
+    return random_grid, answer_key
 
 
 def fill_in(grid, wordlist, sample_size=8):
@@ -52,6 +65,32 @@ def fill_in(grid, wordlist, sample_size=8):
         for y in range(0, len(grid)):
             if grid[x][y] == EMPTY_SPACE:
                 grid[x][y] = choice(preference_letters)
+
+
+def scramble_found_words(grid, wordlist, protected_cells=set()):
+    ''' Ensure the given wordlist only appears once
+
+    Searches the grid for a given word.
+    If the word is found more than once, scrambles any cells which are not included
+    in the protected_cell list (derived from an answer_key)
+
+    '''
+    for word in wordlist:
+        count = 0
+        coordinates_of_words = set()
+        for x in range(len(grid)):
+            for y in range(len(grid)):
+                if grid[x][y] == word[0]:
+                    for direction in DIRECTIONS:
+                        found, possible_coordinates = see_if_word_found(grid, word, x, y, direction)
+                        if found:
+                            coordinates_of_words.union(possible_coordinates)
+                            count += 1
+
+        if (count >= 2 and is_palindrome(word)) or (count >= 1 and not is_palindrome(word)):
+            positions_ok_to_scramble = coordinates_of_words.difference(protected_cells)
+            for x, y in positions_ok_to_scramble:
+                grid[x][y] = choice(string.uppercase)
 
 
 def place_words(grid, words_left):

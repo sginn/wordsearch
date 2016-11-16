@@ -25,7 +25,7 @@ def main():
         print "    NOTE: Rejected words", errors
 
     print "== Generating wordsearch"
-    wordsearch, answer_key = generate_wordsearch(wordlist, difficulty=args.grid_size)
+    wordsearch, answer_key = generate_wordsearch(wordlist, args.grid_size)
 
     print "== Writing wordsearch"
     write_wordsearch(sys.stdout, wordsearch, wordlist)

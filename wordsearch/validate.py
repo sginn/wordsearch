@@ -1,10 +1,12 @@
 from constants import DIRECTIONS
+from grid_helpers import is_palindrome
 
 
 def validate(grid, wordlist):
     ''' Make sure there's only 1 possible solution '''
     for word in wordlist:
-        if count_word(grid, word) != 1:
+        count = count_word(grid, word)
+        if (count != 1 and not is_palindrome(word)) or (count != 2 and is_palindrome(word)):
             return False
     return True
 
