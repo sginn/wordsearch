@@ -136,7 +136,12 @@ def place_words(grid, words_left):
                     # we placed all remaining words so return success!
                     return True
                 else:
+                    if backtrack_count > constants.MAX_BACKTRACK_COUNT:
+                        # let's pop
+                        print "Too many failures with this word placement, let's pop-back out"
+                        return False
                     # remaining words couldn't fit, so undo the insertion and try next direction
+                    backtrack_count += 1
                     _transfer_cells(grid, backtrack_grid)
 
     # we exhausted all positions and directions for this word, backtrack...
